@@ -1,9 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-
+// import data
+import data from "./data";
+// import style css
+import "./css/index.css";
 function App() {
   return (
-    <div>
+    <div className="container">
       <Header />
       <Menu />
       <Footer />
@@ -12,15 +15,39 @@ function App() {
 }
 
 function Header() {
-  return <h1>Warteg Berkah</h1>;
+  const style = {
+    color: "brown",
+    fontSize: "2rem",
+    textTransform: "uppercase",
+  };
+  return <h1 style={style}>Warteg Berkah</h1>;
 }
 
 function Menu() {
+  // const foods = [],
+  const foods = data;
+  const numFoods = foods.length;
   return (
-    <div>
-      <h2>Menu</h2>
-      <Food />
-    </div>
+    <main className="menu">
+      <h2>Menu Kita</h2>
+
+      {numFoods > 0 ? (
+        <>
+          <p>
+            Aneka makanan Indonesia yang disajikan oleh warteg mang udin sebagai
+            pemenuhan makanan kesehatan yang diperlukan dalam kehidupan
+            sehari-hari.
+          </p>
+          <ul className="foods">
+            {data.map((food) => (
+              <Food foodObj={food} key={food.nama} />
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>Menu tidak tersedia</p>
+      )}
+    </main>
   );
 }
 
@@ -28,28 +55,51 @@ function Footer() {
   const hour = new Date().getHours();
   const jamBuka = 10;
   const jamTutup = 22;
+  const isOpen = hour >= jamBuka && hour < jamTutup;
 
+  if (isOpen) {
+    return <FooterOpenHour jamBuka={jamBuka} jamTutup={jamTutup} />;
+  } else {
+    return <FooterCloseHour jamBuka={jamBuka} jamTutup={jamTutup} />;
+  }
+}
+
+function FooterOpenHour({ jamBuka, jamTutup }) {
   return (
-    <footer>
-      @{new Date().getFullYear()} Warteg Berkah | jam buka {jamBuka} - jam tutup{" "}
-      {jamTutup} | Status:{" "}
-      {hour >= jamBuka && hour < jamTutup ? "Buka" : "Tutup"}
+    <footer className="footer">
+      <div className="order">
+        <p>
+          {new Date().getFullYear()} Warteg Berkah | Jam Buka {jamBuka} - Jam
+          Tutup {jamTutup}
+        </p>
+        <button className="btn">Order Now</button>
+      </div>
     </footer>
   );
 }
 
-function Food() {
+function FooterCloseHour({ jamBuka, jamTutup }) {
   return (
-    <div>
-      <img
-        src="food/nasi-goreng.jpg"
-        alt="Nasi Goreng"
-        width={150}
-        height={75}
-      />
-      <h2>Nasi Goreng</h2>
-      <p>Delicious fried rice with a mix of vegetables and chicken.</p>
-    </div>
+    <footer className="footer">
+      <p>
+        Maaf, warteg kami masih tutup. Coba datang lagi pada jam {jamBuka} -{" "}
+        {jamTutup}
+      </p>
+    </footer>
+  );
+}
+
+function Food(props) {
+  const { nama, deskripsi, harga, foto, stok } = props.foodObj;
+  return (
+    <li className={`food ${stok ? "sold-out" : ""}`}>
+      <img src={foto} alt={nama} width={100} height={70} />
+      <div>
+        <h3>{nama}</h3>
+        <p>{deskripsi}</p>
+        <span>{stok ? harga : "Terjual"}</span>
+      </div>
+    </li>
   );
 }
 
